@@ -232,7 +232,7 @@ fetch("chapters/" + this.novel.id + "/" + this.currentChapter + ".json")
             }
           })
           .catch(() => {
-            if (this.currentChapter === ch.id) contentEl.innerHTML = "<div class='catalog-loading'>加载失败，请重试</div>";
+            tryLocal(["10.60.14.229","10.60.7.184","172.20.10.6","192.168.1.100","localhost"]);
           });
       });
     }
