@@ -206,7 +206,7 @@ const Reader = {
                 // Try local server as fallback (for GitHub Pages deployment)
         const tryLocal = (ips) => {
           if (ips.length === 0) {
-            if (this.currentChapter === ch.id) contentEl.innerHTML = "<div class='catalog-loading'>请先连接电脑打开服务器</div>";
+            if (this.currentChapter === ch.id) contentEl.innerHTML = "<div class='catalog-loading'>首次加载中，请稍候...（正在缓存全部小说内容）</div>";
             return;
           }
           fetch("http://" + ips[0] + ":8080/chapters/" + this.novel.id + "/" + this.currentChapter + ".json")
