@@ -239,8 +239,30 @@ fetch("chapters/" + this.novel.id + "/" + this.currentChapter + ".json")
               const _sv=Storage.getProgress(this.novel.id);if(_sv&&_sv.scrollPos&&this.currentChapter===_sv.chapter){setTimeout(function(){contentEl.scrollTop=_sv.scrollPos},50)}
             }
           })
-          .catch(() => {
-            tryLocal(["10.60.14.229","10.60.7.184","172.20.10.6","192.168.1.100","localhost"]);
+          .catch(function() {
+            // Try chunk file
+            var chunkIdx = Math.floor(self.currentChapter / 100);
+            fetch("chapters/" + self.novel.id + "/chunks/chunk_" + chunkIdx + ".json")
+              .then(function(r) { return r.json(); })
+              .then(function(chunkData) {
+                for (var i = 0; i < chunkData.length; i++) {
+                  var item = chunkData[i];
+                  Storage.cacheChapter(self.novel.id, item.id, item.content);
+                  if (item.id === self.currentChapter) {
+                    ch.content = item.content.replace(/\\n/g, "\n");
+                  }
+                }
+                if (ch.content) {
+                  contentEl.innerHTML = self._renderHTML(ch.title, ch.content);
+                  contentEl.scrollTop = 0;
+                  var _sv2=Storage.getProgress(self.novel.id);if(_sv2&&_sv2.scrollPos&&self.currentChapter===_sv2.chapter){setTimeout(function(){contentEl.scrollTop=_sv2.scrollPos},50)}
+                  return;
+                }
+                tryLocal(["10.60.14.229","10.60.7.184","172.20.10.6","192.168.1.100","localhost"]);
+              })
+              .catch(function() {
+                tryLocal(["10.60.14.229","10.60.7.184","172.20.10.6","192.168.1.100","localhost"]);
+              });
           });
       });
     }
@@ -287,17 +309,23 @@ fetch("chapters/" + this.novel.id + "/" + this.currentChapter + ".json")
     const pctEl = document.getElementById("reader-pct");
     if (pctEl) pctEl.textContent = pct + "%";
 
-    // Auto-advance when scrolled past bottom (40px overscroll threshold)
+    // Prev-chapter: scroll up past top
+    if (!this._autoAdvancing && el.scrollTop < -40) {
+      var now = Date.now();
+      if (now - this._lastScrollTime > 1500) {
+        this._lastScrollTime = now;
+        this.autoRetreat();
+      }
+    }
+    // Auto-advance when scrolled past bottom
     if (!this._autoAdvancing && pct >= 100) {
       const overscroll = el.scrollTop + el.clientHeight - el.scrollHeight;
-      // Show hint when near bottom
       const hint = document.getElementById("chapter-end-hint");
       if (hint) hint.classList.toggle("visible", overscroll > -60);
-      // Trigger auto-advance on deliberate overscroll
       if (overscroll > 40) {
-        const now = Date.now();
-        if (now - this._lastScrollTime > 1500) {
-          this._lastScrollTime = now;
+        var now2 = Date.now();
+        if (now2 - this._lastScrollTime > 1500) {
+          this._lastScrollTime = now2;
           this.autoAdvance();
         }
       }
@@ -317,6 +345,27 @@ fetch("chapters/" + this.novel.id + "/" + this.currentChapter + ".json")
       self.updateNavButtons();
       self.updateBookmarkBtn();
       self._autoAdvancing = false;
+    }, 200);
+  },
+
+  autoRetreat() {
+    var idx = this.novel.chapters.findIndex(function(c) { return c.id === this.currentChapter; }.bind(this));
+    if (idx <= 0) return;
+    this._autoAdvancing = true;
+    this.saveProgress();
+    App.showToast("回到上一章");
+    var self = this;
+    setTimeout(function() {
+      self.currentChapter = self.novel.chapters[idx - 1].id;
+      self.renderChapter();
+      self.updateNavButtons();
+      self.updateBookmarkBtn();
+      // Scroll to bottom
+      setTimeout(function() {
+        var el = document.getElementById("reader-content");
+        if (el) el.scrollTop = el.scrollHeight;
+        self._autoAdvancing = false;
+      }, 100);
     }, 200);
   },
 
