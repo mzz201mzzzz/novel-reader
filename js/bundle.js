@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿// === Storage Manager ===
+// === Storage Manager ===
 const Storage = {
   _prefix: "novel_",
 
@@ -933,7 +933,7 @@ Novels.push({
   title:"凡人修仙传",
   author:"忘语",
   coverGradient:"linear-gradient(135deg, #1a1a2e, #16213e, #0f3460)",
-  description:"完整版 2652章 (人界篇1265 + 仙界篇1387)",
+  description: "灵界篇 1185章",
   chapters:[
     {id:1,title:"第一章 山边小村"},
     {id:2,title:"第二章 青牛镇"},
@@ -3595,7 +3595,7 @@ Novels.push({
   title: "凡人修仙传·灵界篇",
   author: "忘语",
   coverGradient: "linear-gradient(135deg, #1a3a2e, #2d5a3e, #1a4a2e)",
-  灵界篇 1185章,
+  description: "灵界篇 1185章",
   chapters: [    {id:1266,title:"第一千二百六十二章 陌生之地"},
     {id:1267,title:"第一千二百六十三章 血咒文书与灵具"},
     {id:1268,title:"第一千二百六十四章 天东商号"},
@@ -4789,7 +4789,7 @@ Novels.push({
   title:"牧神记",
   author:"宅猪",
   coverGradient:"linear-gradient(135deg, #1e3c72, #2a5298, #7b4397)",
-  description:"如果您喜欢小说牧神记，请将牧神记最新章节目录加入收藏方便您下次阅读,香书小说将在第一时间更新小说牧神记，发现没及时更新，请告知我们,谢谢!",
+  description: "灵界篇 1185章",
   chapters:[
     {id:1,title:"第一章 天黑别出门"},
     {id:2,title:"第二章 四灵血"},
