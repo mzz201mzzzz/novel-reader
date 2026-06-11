@@ -351,3 +351,19 @@ body {
 .catalog-scrollbar .thumb:hover .thumb-label {
   display: block;
 }
+
+/* === Chapter End Auto-Advance Hint === */
+.chapter-end-hint {
+  text-align: center; padding: 32px 16px 48px;
+  opacity: 0; transition: opacity 0.3s;
+  pointer-events: none;
+}
+.chapter-end-hint.visible {
+  opacity: 0.6;
+}
+.chapter-end-hint span {
+  font-size: 14px; color: #8e8e93;
+}
+.theme-dark .chapter-end-hint span { color: #636366; }
+.theme-sepia .chapter-end-hint span { color: #8b7355; }
+.theme-green .chapter-end-hint span { color: #5a7a5a; }
