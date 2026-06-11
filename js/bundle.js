@@ -184,13 +184,18 @@ const Reader = {
     }
   },
 
+  _renderHTML(title, content) {
+    return "<h3>" + title + "</h3>" + content.split("\n").filter(function(p) { return p.trim(); }).map(function(p) { return "<p>" + p.trim() + "</p>"; }).join("") + '<div id="chapter-end-hint" class="chapter-end-hint"><span>继续下滑进入下一章</span></div>';
+  },
+
   renderChapter() {
     const ch = this.novel.chapters.find(c => c.id === this.currentChapter);
     if (!ch) return;
     document.getElementById("reader-chapter-title").textContent = ch.title;
     const contentEl = document.getElementById("reader-content");
+    var self = this;
     if (ch.content) {
-      contentEl.innerHTML = "<h3>" + ch.title + "</h3>" + ch.content.replace(/\\n/g, "\n").split("\n").filter(p => p.trim()).map(p => "<p>" + p.trim() + "</p>").join("");
+      contentEl.innerHTML = self._renderHTML(ch.title, ch.content.replace(/\\n/g, "\n"));
       contentEl.scrollTop = 0;
     } else {
       contentEl.innerHTML = "<div class='catalog-loading' style='padding-top:60px'>加载中...</div>";
@@ -198,7 +203,7 @@ const Reader = {
         if (cached) {
           ch.content = cached.replace(/\\n/g, "\n");
           if (this.currentChapter === ch.id) {
-            contentEl.innerHTML = "<h3>" + ch.title + "</h3>" + ch.content.split("\n").filter(p => p.trim()).map(p => "<p>" + p.trim() + "</p>").join("");
+            contentEl.innerHTML = self._renderHTML(ch.title, ch.content);
             const _sv=Storage.getProgress(this.novel.id);if(_sv&&_sv.scrollPos&&this.currentChapter===_sv.chapter){contentEl.scrollTop=_sv.scrollPos}
           }
           return;
@@ -215,7 +220,7 @@ const Reader = {
               ch.content = data.content.replace(/\\n/g, "\n");
               Storage.cacheChapter(this.novel.id, this.currentChapter, ch.content);
               if (this.currentChapter === data.id) {
-                contentEl.innerHTML = "<h3>" + ch.title + "</h3>" + ch.content.split("\n").filter(p => p.trim()).map(p => "<p>" + p.trim() + "</p>").join("");
+                contentEl.innerHTML = self._renderHTML(ch.title, ch.content);
                 var _sv=Storage.getProgress(this.novel.id);if(_sv&&_sv.scrollPos&&this.currentChapter===_sv.chapter){contentEl.scrollTop=_sv.scrollPos}
               }
             })
@@ -227,7 +232,7 @@ fetch("chapters/" + this.novel.id + "/" + this.currentChapter + ".json")
             ch.content = data.content.replace(/\\n/g, "\n");
             Storage.cacheChapter(this.novel.id, this.currentChapter, ch.content);
             if (this.currentChapter === data.id) {
-              contentEl.innerHTML = "<h3>" + ch.title + "</h3>" + ch.content.split("\n").filter(p => p.trim()).map(p => "<p>" + p.trim() + "</p>").join("");
+              contentEl.innerHTML = self._renderHTML(ch.title, ch.content);
               const _sv=Storage.getProgress(this.novel.id);if(_sv&&_sv.scrollPos&&this.currentChapter===_sv.chapter){contentEl.scrollTop=_sv.scrollPos}
             }
           })
@@ -268,6 +273,9 @@ fetch("chapters/" + this.novel.id + "/" + this.currentChapter + ".json")
     document.getElementById("btn-next-chapter").disabled = idx === this.novel.chapters.length - 1;
   },
 
+  _autoAdvancing: false,
+  _lastScrollTime: 0,
+
   onScroll() {
     const el = document.getElementById("reader-content");
     const pct = Math.min(100, Math.round((el.scrollTop / (el.scrollHeight - el.clientHeight)) * 100));
@@ -275,6 +283,38 @@ fetch("chapters/" + this.novel.id + "/" + this.currentChapter + ".json")
     document.getElementById("progress-text").textContent = pct + "%";
     const pctEl = document.getElementById("reader-pct");
     if (pctEl) pctEl.textContent = pct + "%";
+
+    // Auto-advance when scrolled past bottom (40px overscroll threshold)
+    if (!this._autoAdvancing && pct >= 100) {
+      const overscroll = el.scrollTop + el.clientHeight - el.scrollHeight;
+      // Show hint when near bottom
+      const hint = document.getElementById("chapter-end-hint");
+      if (hint) hint.classList.toggle("visible", overscroll > -60);
+      // Trigger auto-advance on deliberate overscroll
+      if (overscroll > 40) {
+        const now = Date.now();
+        if (now - this._lastScrollTime > 1500) {
+          this._lastScrollTime = now;
+          this.autoAdvance();
+        }
+      }
+    }
+  },
+
+  autoAdvance() {
+    var idx = this.novel.chapters.findIndex(function(c) { return c.id === this.currentChapter; }.bind(this));
+    if (idx >= this.novel.chapters.length - 1) return;
+    this._autoAdvancing = true;
+    this.saveProgress();
+    App.showToast("进入下一章");
+    var self = this;
+    setTimeout(function() {
+      self.currentChapter = self.novel.chapters[idx + 1].id;
+      self.renderChapter();
+      self.updateNavButtons();
+      self.updateBookmarkBtn();
+      self._autoAdvancing = false;
+    }, 200);
   },
 
   saveProgress() {
@@ -397,6 +437,7 @@ fetch("chapters/" + this.novel.id + "/" + this.currentChapter + ".json")
     }
   }
 };
+
 // === App Controller ===
 const App = {
   currentNovel: null,
