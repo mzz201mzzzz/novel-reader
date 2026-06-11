@@ -924,7 +924,6 @@ setInterval(function() {
 }, 3000);
 
 window.addEventListener("beforeunload", function() { if (Reader.novel) Reader.saveProgress(); });
-App.init();
 var Novels = [];
 // 凡人修仙传 - 忘语 (完整版)
 // Chapters: 2652
@@ -6749,7 +6748,6 @@ setInterval(function() {
 }, 3000);
 
 window.addEventListener("beforeunload", function() { if (Reader.novel) Reader.saveProgress(); });
-App.init();
 // Scroll + tap to load more chapters
 document.addEventListener("DOMContentLoaded", function() {
   var list = document.getElementById("catalog-list");
@@ -6779,7 +6777,6 @@ setInterval(function() {
 }, 3000);
 
 window.addEventListener("beforeunload", function() { if (Reader.novel) Reader.saveProgress(); });
-App.init();
 // Scroll + tap to load more chapters
 document.addEventListener("DOMContentLoaded", function() {
   var list = document.getElementById("catalog-list");
@@ -6809,7 +6806,6 @@ setInterval(function() {
 }, 3000);
 
 window.addEventListener("beforeunload", function() { if (Reader.novel) Reader.saveProgress(); });
-App.init();
 // Scroll + tap to load more chapters
 document.addEventListener("DOMContentLoaded", function() {
   var list = document.getElementById("catalog-list");
@@ -6839,7 +6835,6 @@ setInterval(function() {
 }, 3000);
 
 window.addEventListener("beforeunload", function() { if (Reader.novel) Reader.saveProgress(); });
-App.init();
 // Scroll + tap to load more chapters
 document.addEventListener("DOMContentLoaded", function() {
   var list = document.getElementById("catalog-list");
@@ -6869,5 +6864,6 @@ setInterval(function() {
 }, 3000);
 
 window.addEventListener("beforeunload", function() { if (Reader.novel) Reader.saveProgress(); });
-App.init();
 
+
+document.addEventListener(DOMContentLoaded, function() { App.init(); });
