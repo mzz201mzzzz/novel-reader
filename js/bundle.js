@@ -6866,4 +6866,4 @@ setInterval(function() {
 window.addEventListener("beforeunload", function() { if (Reader.novel) Reader.saveProgress(); });
 
 
-document.addEventListener(DOMContentLoaded, function() { App.init(); });
+document.addEventListener("DOMContentLoaded", function() { App.init(); });
